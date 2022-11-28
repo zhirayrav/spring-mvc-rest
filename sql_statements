@@ -1,0 +1,2 @@
+select * from person
+insert into person values(7,'Vlad',40,'vlad@gmail.com')
