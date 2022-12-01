@@ -28,7 +28,7 @@ public class PersonDAO {
 		 new BeanPropertyRowMapper<>(Person.class),id).stream().findAny().orElse(null);
 	}
 	public void save(Person person) {
-		jdbcTemplate.update("insert into person values(1,?,?,?)",person.getName(),person.getAge(),person.getEmail());
+		jdbcTemplate.update("insert into person(name,age,email) values(?,?,?)",person.getName(),person.getAge(),person.getEmail());
 	}
 	public void update (int id,Person updatedPerson) {
 		jdbcTemplate.update("update person set name=?,age=?,email=? where id=?",updatedPerson.getName(),updatedPerson.getAge(),updatedPerson.getEmail(),id);
@@ -44,7 +44,7 @@ public class PersonDAO {
 		List<Person> people = create1000People();
 		long before = System.currentTimeMillis();
 		for(Person person : people) {
-			jdbcTemplate.update("insert into person values(?,?,?,?)",person.getId(),person.getName(),person.getAge(),person.getEmail());
+			jdbcTemplate.update("insert into person values(?,?,?)",person.getName(),person.getAge(),person.getEmail());
 		}
 		long after = System.currentTimeMillis();
 		System.out.println("Time : " + (after - before));
@@ -52,14 +52,13 @@ public class PersonDAO {
 	public void testBatchUpdate() {
 		List<Person> people = create1000People();
 		long before = System.currentTimeMillis();
-		jdbcTemplate.batchUpdate("insert into person values(?,?,?,?)", new BatchPreparedStatementSetter() {
+		jdbcTemplate.batchUpdate("insert into person(name,age,email) values(?,?,?)", new BatchPreparedStatementSetter() {
 	
 			@Override
 			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				ps.setInt(1, people.get(i).getId());
-				ps.setString(2, people.get(i).getName());
-				ps.setInt(3, people.get(i).getAge());
-				ps.setString(4, people.get(i).getEmail());
+				ps.setString(1, people.get(i).getName());
+				ps.setInt(2, people.get(i).getAge());
+				ps.setString(3, people.get(i).getEmail());
 			}
 			
 			@Override
