@@ -16,22 +16,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.company.springcourse.dao.PersonDAO;
 import com.company.springcourse.models.Person;
+import com.company.springcourse.utils.PersonValidator;
 
 
 
 @Controller
 @RequestMapping("/people")
 public class PeopleController {
-	private PersonDAO personDAO;
+	private final PersonDAO personDAO;
+	private final PersonValidator personValidator;
 	@Autowired
-	public PeopleController(PersonDAO personDAO) {
+	public PeopleController(PersonDAO personDAO, PersonValidator personValidator) {
+		super();
 		this.personDAO = personDAO;
+		this.personValidator = personValidator;
 	}
 	@GetMapping()
 	public String index(Model model) {
 		model.addAttribute("list",personDAO.index());
 		return "people/index";
 	}
+	
 	@GetMapping("/{id}")
 	public String show(@PathVariable("id") int id,Model model) {
 		model.addAttribute("person",personDAO.show(id));
@@ -44,6 +49,7 @@ public class PeopleController {
 	}
 	@PostMapping()
 	public  String create (@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
+		personValidator.validate(person, bindingResult);
 		if(bindingResult.hasErrors())
 			return "people/new";
 		personDAO.save(person);
@@ -56,6 +62,7 @@ public class PeopleController {
 	}
 	@PatchMapping("/{id}")
 	public String update(@PathVariable("id") int id,@ModelAttribute("person") @Valid Person person, BindingResult bindingResult) {
+		personValidator.validate(person, bindingResult);
 		if(bindingResult.hasErrors())
 			return "people/edit";
 		personDAO.update(id,person);
